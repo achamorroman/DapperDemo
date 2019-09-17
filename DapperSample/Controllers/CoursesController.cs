@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using DapperSample.Models;
-using DapperSample.Storage;
+﻿using System.Collections.Generic;
+using DapperDemo.Models;
+using DapperDemo.Storage;
 using Microsoft.AspNetCore.Mvc;
 
-namespace DapperSample.Controllers
+namespace DapperDemo.Controllers
 {
     [Route("api/[controller]")]
     public class CoursesController : Controller

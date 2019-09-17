@@ -1,6 +1,6 @@
 ﻿using Dapper.Contrib.Extensions;
 
-namespace DapperSample.Models
+namespace DapperDemo.Models
 {
     public class Student
     {

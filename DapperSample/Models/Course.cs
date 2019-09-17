@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Policy;
-using System.Threading.Tasks;
-using Dapper;
+﻿using System.Collections.Generic;
 
-namespace DapperSample.Models
+namespace DapperDemo.Models
 {
     public class Course
     {

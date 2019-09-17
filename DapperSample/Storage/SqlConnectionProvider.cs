@@ -1,7 +1,7 @@
 ﻿using System.Data;
 using System.Data.SqlClient;
 
-namespace DapperSample.Storage
+namespace DapperDemo.Storage
 {
     public class SqlConnectionProvider
     {

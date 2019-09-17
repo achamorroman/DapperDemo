@@ -1,14 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Data.SqlClient;
 using System.Linq;
-using System.Threading.Tasks;
 using Dapper;
-using DapperSample.Models;
-using Microsoft.EntityFrameworkCore;
+using DapperDemo.Models;
 
-namespace DapperSample.Storage
+namespace DapperDemo.Storage
 {
     public class CourseQueries
     {

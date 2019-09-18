@@ -1,5 +1,6 @@
 ﻿using System;
 using Dapper;
+using Dapper.Contrib.Extensions;
 using DapperDemo.Models;
 
 namespace DapperDemo.Storage
@@ -22,6 +23,7 @@ namespace DapperDemo.Storage
                 try
                 {
                     dbConnection.Open();
+                    // var newid = dbConnection.Insert<Course>(newCourse);
                     dbConnection.Execute(sql, newCourse);
                 }
                 catch (Exception e)

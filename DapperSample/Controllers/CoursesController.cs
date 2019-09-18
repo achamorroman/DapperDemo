@@ -24,6 +24,13 @@ namespace DapperDemo.Controllers
             return _courseQueries.GetAll();
         }
 
+        [Route("StudentCount")]
+        [HttpGet]
+        public IEnumerable<CourseResume> GetStudentCount()
+        {
+            return _courseQueries.GetStudentsByCourse();
+        }
+
         // GET api/courses/5
         [HttpGet("{id}")]
         public Course Get(int id)

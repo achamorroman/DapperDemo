@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Swashbuckle.AspNetCore.Swagger;
 
 namespace DapperDemo.Extensions
 {
@@ -9,18 +8,26 @@ namespace DapperDemo.Extensions
         {
             public static IServiceCollection AddSwaggerConfiguration(this IServiceCollection services)
             {
-                services.AddSwaggerGen(swagger =>
+                services.AddSwaggerDocument(config =>
                 {
-                    var contact = new Contact() { Name = SwaggerConfiguration.ContactName, Url = SwaggerConfiguration.ContactUrl };
-                    swagger.SwaggerDoc(SwaggerConfiguration.DocNameV1,
-                        new Info
+                    config.PostProcess = document =>
+                    {
+                        document.Info.Version = SwaggerConfiguration.DocInfoVersion;
+                        document.Info.Title = SwaggerConfiguration.DocInfoTitle;
+                        document.Info.Description = SwaggerConfiguration.DocInfoDescription;
+                        document.Info.TermsOfService = "None";
+                        document.Info.Contact = new NSwag.OpenApiContact
                         {
-                            Title = SwaggerConfiguration.DocInfoTitle,
-                            Version = SwaggerConfiguration.DocInfoVersion,
-                            Description = SwaggerConfiguration.DocInfoDescription,
-                            Contact = contact
-                        }
-                    );
+                            Name = SwaggerConfiguration.ContactName,
+                            Email = SwaggerConfiguration.ContactEmail,
+                            Url = SwaggerConfiguration.ContactUrl
+                        };
+                        document.Info.License = new NSwag.OpenApiLicense
+                        {
+                            Name = "Use under LICX",
+                            Url = "https://example.com/license"
+                        };
+                    };
                 });
 
                 return services;

@@ -69,18 +69,26 @@ namespace DapperDemo.Storage
             }
         }
 
-        public IEnumerable<CourseResume> GetStudentsByCourse()
+        public IEnumerable<CourseSummary> GetCourseSummary()
         {
             using (var dbConnection = _connectionProvider.GetNewConnection)
             {
-                var sql = @"select C.ID, C.Description, C.Name, Count(S.ID) as StudentCount 
-from courses C inner join CoursesStudents CS on c.ID = cs.CourseId inner join Students S on S.ID = cs.StudentId
-group by C.ID, C.Description, C.Name";
+                var sql = @"SELECT 
+	                            C.ID, 
+	                            C.Description, 
+	                            C.Name, 
+	                            Count(CS.StudentId) as StudentCount 
+                            FROM 
+	                            courses C 
+                            INNER JOIN 
+	                            CoursesStudents CS on c.ID = cs.CourseId
+                            GROUP BY 
+	                            C.ID, C.Description, C.Name";
 
                 try
                 {
                     dbConnection.Open();
-                    return dbConnection.Query<CourseResume>(sql);
+                    return dbConnection.Query<CourseSummary>(sql);
                 }
                 catch (Exception e)
                 {
@@ -89,13 +97,5 @@ group by C.ID, C.Description, C.Name";
                 }
             }
         }
-    }
-
-    public class CourseResume 
-    {
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public string Description { get; set; }
-        public int StudentCount { get; set; }
     }
 }

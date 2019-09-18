@@ -18,13 +18,19 @@ namespace DapperDemo.Storage
         {
             using (var dbConnection = _connectionProvider.GetNewConnection)
             {
-                var sql = @"INSERT INTO Courses (Name, Description, DurationHours, Price)
-                            VALUES(@Name, @Description, @DurationHours, @Price)";
+                // Al utilizar el método de extensión Insert, no es necesaria la sentencia. 
+                //var sql = @"INSERT INTO Courses (Name, Description, DurationHours, Price)
+                //            VALUES(@Name, @Description, @DurationHours, @Price)";
+
                 try
                 {
                     dbConnection.Open();
-                    // var newid = dbConnection.Insert<Course>(newCourse);
-                    dbConnection.Execute(sql, newCourse);
+                    // Utilizamos el paquete Dapper.Contrib, que incluye más métodos de extensión
+                    // https://dapper-tutorial.net/dapper-contrib
+                    dbConnection.Insert<Course>(newCourse);
+
+                    // De esta manera se utilizará la SQL con dapper
+                    // dbConnection.Execute(sql, newCourse);
                 }
                 catch (Exception e)
                 {
@@ -47,6 +53,9 @@ namespace DapperDemo.Storage
 
                 try
                 {
+                    // Usando el paquete Dapper.Contrib, podemos hacer:
+                    // dbConnection.Update<Course>(course);
+
                     dbConnection.Open();
                     dbConnection.Query(sql, course);
                 }

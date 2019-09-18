@@ -42,6 +42,57 @@ namespace DapperDemo.Storage
             }
         }
 
+        public IEnumerable<Course> GetWithChilds()
+        {
+            using (var dbConnection = _connectionProvider.GetNewConnection)
+            {
+                var sql = @"SELECT 
+	                            C.ID,
+	                            C.Name, 
+	                            C.Description, 
+	                            C.DurationHours,
+	                            C.Price,
+	                            S.ID,
+	                            S.FirstName,
+	                            S.LastName,
+	                            S.Email
+                            FROM 
+	                            courses C 
+                            LEFT JOIN 
+	                            CoursesStudents CS on c.ID = cs.CourseId
+                            LEFT JOIN 
+	                            Students S on CS.StudentId = S.ID";
+
+                try
+                {
+                    var courseDictionary = new Dictionary<int, Course>();
+
+                    dbConnection.Open();
+                    return dbConnection.Query<Course,Student,Course>(sql,
+                        (course, student) =>
+                        {
+                            Course courseEntry;
+                            if (!courseDictionary.TryGetValue(course.Id, out courseEntry))
+                            {
+                                courseEntry = course;
+                                courseEntry.Students = new List<Student>();
+                                courseDictionary.Add(courseEntry.Id, courseEntry);
+                            }
+
+                            courseEntry.Students.Add(student);
+                            return courseEntry;
+                        })
+                        .Distinct()
+                        .ToList();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                    throw;
+                }
+            }
+        }
+
         public Course GetById(int id)
         {
             using (var dbConnection = _connectionProvider.GetNewConnection)

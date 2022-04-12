@@ -4,6 +4,7 @@ using System.Linq;
 using Dapper;
 using Dapper.Contrib.Extensions;
 using DapperDemo.Models;
+using Microsoft.AspNetCore.Razor.Language.Extensions;
 
 namespace DapperDemo.Storage
 {
@@ -47,15 +48,8 @@ namespace DapperDemo.Storage
             using (var dbConnection = _connectionProvider.GetNewConnection)
             {
                 var sql = @"SELECT 
-	                            C.ID,
-	                            C.Name, 
-	                            C.Description, 
-	                            C.DurationHours,
-	                            C.Price,
-	                            S.ID,
-	                            S.FirstName,
-	                            S.LastName,
-	                            S.Email
+                                C.ID,C.Name, C.Description, C.DurationHours,C.Price,
+                                S.ID,S.FirstName,S.LastName,S.Email
                             FROM 
 	                            courses C 
                             LEFT JOIN 
@@ -63,33 +57,26 @@ namespace DapperDemo.Storage
                             LEFT JOIN 
 	                            Students S on CS.StudentId = S.ID";
 
-                try
-                {
-                    var courseDictionary = new Dictionary<int, Course>();
 
-                    dbConnection.Open();
-                    return dbConnection.Query<Course,Student,Course>(sql,
-                        (course, student) =>
+                var courseDictionary = new Dictionary<int, Course>();
+
+                dbConnection.Open();
+                return dbConnection.Query<Course, Student, Course>(sql,
+                    (course, student) =>
+                    {
+                        Course courseEntry;
+                        if (!courseDictionary.TryGetValue(course.Id, out courseEntry))
                         {
-                            Course courseEntry;
-                            if (!courseDictionary.TryGetValue(course.Id, out courseEntry))
-                            {
-                                courseEntry = course;
-                                courseEntry.Students = new List<Student>();
-                                courseDictionary.Add(courseEntry.Id, courseEntry);
-                            }
+                            courseEntry = course;
+                            courseEntry.Students = new List<Student>();
+                            courseDictionary.Add(courseEntry.Id, courseEntry);
+                        }
 
-                            courseEntry.Students.Add(student);
-                            return courseEntry;
-                        })
-                        .Distinct()
-                        .ToList();
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                    throw;
-                }
+                        courseEntry.Students.Add(student);
+                        return courseEntry;
+                    })
+                    .Distinct()
+                    .ToList();
             }
         }
 
@@ -107,18 +94,18 @@ namespace DapperDemo.Storage
                                 Courses 
                             WHERE 
                                 Id = @Id";
-                try
-                {
-                    dbConnection.Open();
-                    return dbConnection.Query<Course>(sql, new { Id = id }).FirstOrDefault();
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                    throw;
-                }
+                return dbConnection.QuerySingle<Course>(sql, new { Id = id });
             }
         }
+
+        public Course GetByIdContrib(int id)
+        {
+            using (var dbConnection = _connectionProvider.GetNewConnection)
+            {
+                return dbConnection.Get<Course>(id);
+            }
+        }
+
 
         public IEnumerable<CourseSummary> GetCourseSummary()
         {

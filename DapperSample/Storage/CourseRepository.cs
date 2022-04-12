@@ -14,31 +14,28 @@ namespace DapperDemo.Storage
             _connectionProvider = connectionProvider;
         }
 
-        public void Add(Course newCourse)
+        public Course Add(Course newCourse)
         {
             using (var dbConnection = _connectionProvider.GetNewConnection)
             {
-                // Al utilizar el método de extensión Insert, no es necesaria la sentencia. 
-                //var sql = @"INSERT INTO Courses (Name, Description, DurationHours, Price)
-                //            VALUES(@Name, @Description, @DurationHours, @Price)";
+                var sql = @"INSERT INTO Courses (Name, Description, DurationHours, Price)
+                            VALUES(@Name, @Description, @DurationHours, @Price)";
 
-                try
-                {
-                    dbConnection.Open();
-                    // Utilizamos el paquete Dapper.Contrib, que incluye más métodos de extensión
-                    // https://dapper-tutorial.net/dapper-contrib
-                    dbConnection.Insert<Course>(newCourse);
-
-                    // De esta manera se utilizará la SQL con dapper
-                    // dbConnection.Execute(sql, newCourse);
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                    throw;
-                }
+                dbConnection.Execute(sql, newCourse);
+                return newCourse;
             }
         }
+
+        public Course AddContrib(Course newCourse)
+        {
+            using (var dbConnection = _connectionProvider.GetNewConnection)
+            {
+                dbConnection.Insert<Course>(newCourse);
+                return newCourse;
+            }
+        }
+
+
         public void Update(Course course)
         {
             using (var dbConnection = _connectionProvider.GetNewConnection)
@@ -51,19 +48,15 @@ namespace DapperDemo.Storage
                             WHERE 
                                 ID = @Id";
 
-                try
-                {
-                    // Usando el paquete Dapper.Contrib, podemos hacer:
-                    // dbConnection.Update<Course>(course);
+                dbConnection.Query(sql, course);
+            }
+        }
 
-                    dbConnection.Open();
-                    dbConnection.Query(sql, course);
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                    throw;
-                }
+        public void UpdateContrib(Course course)
+        {
+            using (var dbConnection = _connectionProvider.GetNewConnection)
+            {
+                dbConnection.Update<Course>(course);
             }
         }
 
@@ -72,18 +65,20 @@ namespace DapperDemo.Storage
             using (var dbConnection = _connectionProvider.GetNewConnection)
             {
                 var sql = "DELETE FROM Courses WHERE ID = @Id";
-
-                try
-                {
-                    dbConnection.Open();
-                    dbConnection.Execute(sql, new { Id = id });
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                    throw;
-                }
+                dbConnection.Execute(sql, new { Id = id });
             }
         }
+
+        public void DeleteContrib(int id)
+        {
+            using (var dbConnection = _connectionProvider.GetNewConnection)
+            {
+                var course = dbConnection.Get<Course>(id);
+                dbConnection.Delete(course);
+            }
+        }
+
     }
+
+
 }
